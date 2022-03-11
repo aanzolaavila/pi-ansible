@@ -1,0 +1,25 @@
+---
+- name: kubelet
+  hosts: all
+  become: yes
+  tasks:
+    - name: install snap
+      apt:
+        name: snapd
+        state: present
+        update_cache: yes
+      notify: start_snapd_socket
+
+    - name: install kubelet
+      snap:
+        name: kubelet
+        state: present
+        classic: yes
+
+- handlers:
+  - name: start_snapd_socket
+    become: yes
+    service:
+      name: snapd.socket
+      state: started
+      enabled: yes
