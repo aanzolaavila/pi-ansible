@@ -1,0 +1,16 @@
+---
+- name: Utilities
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install utilities
+      package:
+        name: "{{item}}"
+      loop:
+        - cron
+
+    - name: utilities services
+      service:
+        name: cron
+        state: started
+        enabled: yes

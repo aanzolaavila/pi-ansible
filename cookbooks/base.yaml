@@ -49,6 +49,12 @@
         name: docker-compose
         state: present
 
+    - name: set system swapiness
+      ansible.posix.sysctl:
+        name: vm.swappiness
+        value: '0'
+        state: present
+
   handlers:
     - name: restart docker
       service:
