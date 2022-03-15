@@ -1,0 +1,12 @@
+---
+- name: Mount points at boot time
+  hosts: all
+  become: yes
+  tasks:
+    - name: Store HDD
+      mount:
+        path: /mnt/hdd
+        state: mounted
+        src: UUID=5E66-6BB1
+        fstype: exfat
+        opts: umask=0000

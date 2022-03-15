@@ -3,3 +3,5 @@
 - import_playbook: gui.yaml
 - import_playbook: utilities.yaml
 - import_playbook: scripts.yaml
+- import_playbook: mounts.yaml
+- import_playbook: containers.yaml

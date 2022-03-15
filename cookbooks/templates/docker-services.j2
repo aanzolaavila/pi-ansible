@@ -1,0 +1,17 @@
+[Unit]
+Description=Docker Compose service for {{item}}
+After=docker.service network-online.target
+Requires=docker.service network-online.target
+
+[Service]
+WorkingDirectory=/opt/services/{{item}}
+Type=oneshot
+RemainAfterExit=yes
+
+ExecStartPre=/usr/local/bin/docker-compose pull --quiet
+ExecStart=/usr/local/bin/docker-compose up -d
+
+ExecStop=/usr/local/bin/docker-compose up -d
+
+ExecReload=/usr/local/bin/docker-compose pull --quiet
+ExecReload=/usr/local/bin/docker-compose up -d

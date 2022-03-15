@@ -1,25 +1,37 @@
 ---
-- name: kubelet
+- name: docker compose
   hosts: all
   become: yes
   tasks:
-    - name: install snap
-      apt:
-        name: snapd
-        state: present
-        update_cache: yes
-      notify: start_snapd_socket
+    - name: docker compose templates
+      template:
+        src: templates/docker-services.j2
+        dest: /etc/systemd/system/{{item}}-compose.service
+      loop:
+        - plex
+        - qbittorrent
 
-    - name: install kubelet
-      snap:
-        name: kubelet
-        state: present
-        classic: yes
+    - name: directories
+      file:
+        path: /opt/services/{{item}}
+        state: directory
+      loop:
+        - plex
+        - qbittorrent
 
-- handlers:
-  - name: start_snapd_socket
-    become: yes
-    service:
-      name: snapd.socket
-      state: started
-      enabled: yes
+    - name: compose stacks
+      copy:
+        src: files/{{item}}-compose.yaml
+        dest: /opt/services/{{item}}/docker-compose.yaml
+      loop:
+        - plex
+        - qbittorrent
+
+    - name: enable services
+      service:
+        name: "{{item}}-compose.service"
+        state: started
+        enabled: yes
+      loop:
+        - plex
+        - qbittorrent
