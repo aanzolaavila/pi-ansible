@@ -3,35 +3,47 @@
   hosts: all
   become: yes
   tasks:
+    - name: creating user to store configurations
+      user:
+        name: homeserver
+        password: 'homeserver'
+        groups:
+         - docker
+        state: present
+        shell: /bin/bash
+        system: no
+        createhome: yes
+
     - name: docker compose templates
       template:
         src: templates/docker-services.j2
         dest: /etc/systemd/system/{{item}}-compose.service
       loop:
-        - plex
-        - qbittorrent
+        - mediaserver
+        - homebridge
 
     - name: directories
       file:
         path: /opt/services/{{item}}
         state: directory
       loop:
-        - plex
-        - qbittorrent
+        - mediaserver
+        - homebridge
 
     - name: compose stacks
       copy:
         src: files/{{item}}-compose.yaml
         dest: /opt/services/{{item}}/docker-compose.yaml
       loop:
-        - plex
-        - qbittorrent
+        - mediaserver
+        - homebridge
 
     - name: enable services
-      service:
+      systemd:
         name: "{{item}}-compose.service"
         state: started
         enabled: yes
+        daemon_reload: yes
       loop:
-        - plex
-        - qbittorrent
+        - mediaserver
+        - homebridge
