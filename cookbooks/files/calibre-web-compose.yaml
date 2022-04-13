@@ -1,0 +1,20 @@
+---
+version: "2.1"
+services:
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web
+    container_name: calibre-web
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Bogota
+      # - DOCKER_MODS=linuxserver/calibre-web:calibre #optional
+      # - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
+    volumes:
+      - /home/homeserver/.config/calibre/config:/config
+      - /mnt/hdd/books:/books
+    ports:
+      - 8083:8083
+    expose:
+      - "8083"
+    restart: unless-stopped

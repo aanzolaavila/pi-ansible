@@ -21,6 +21,7 @@
       loop:
         - mediaserver
         - homebridge
+        - calibre-web
 
     - name: directories
       file:
@@ -29,6 +30,7 @@
       loop:
         - mediaserver
         - homebridge
+        - calibre-web
 
     - name: compose stacks
       copy:
@@ -37,6 +39,7 @@
       loop:
         - mediaserver
         - homebridge
+        - calibre-web
 
     - name: enable services
       systemd:
@@ -47,3 +50,4 @@
       loop:
         - mediaserver
         - homebridge
+        - calibre-web
