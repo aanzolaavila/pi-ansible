@@ -11,16 +11,17 @@ function log () {
 function move() {
   local from=${1}
   local to=${2}
+  echo "Trying to move ${from} to ${to}"
   if [[ -d ${from} ]] || [[ -f ${from} ]]; then
     log "moved ${from} to ${to}"
-    mv "${from}" ${to}
+    mv "${from}" "${to}"
   fi
 }
 
 for i in downloads/series/*; do
-  move $i series/
+  move "$i" "series/"
 done
 
 for i in downloads/movies/*; do
-  move $i movies/
+  move "$i" "movies/"
 done
