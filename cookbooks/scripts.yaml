@@ -17,6 +17,6 @@
     - name: organize torrents cron
       cron:
         name: organize-torrents
-        minute: "*/5"
+        minute: "*/1"
         job: "/home/pi/scripts/organize-torrents.sh"
         user: pi
