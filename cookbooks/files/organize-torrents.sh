@@ -14,7 +14,7 @@ function move() {
   echo "Trying to move ${from} to ${to}"
   if [[ -d ${from} ]] || [[ -f ${from} ]]; then
     log "moved ${from} to ${to}"
-    mv "${from}" "${to}"
+    mv "${from}" "${to}" || log "failed to move ${from} to ${to}"
   fi
 }
 
