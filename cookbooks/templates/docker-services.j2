@@ -8,7 +8,6 @@ WorkingDirectory=/opt/services/{{item}}
 Type=oneshot
 RemainAfterExit=yes
 
-ExecStartPre=/usr/local/bin/docker-compose pull --quiet
 ExecStart=/usr/local/bin/docker-compose up -d
 
 ExecStop=/usr/local/bin/docker-compose down

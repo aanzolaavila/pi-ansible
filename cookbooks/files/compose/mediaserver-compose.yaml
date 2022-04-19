@@ -11,8 +11,7 @@ services:
       - WEBUI_PORT=8080
     volumes:
       - /home/homeserver/.config/qbittorrent/config:/config
-      - /mnt/hdd/downloads:/downloads
-      - /mnt/hdd/torrents:/torrents
+      - /mnt/hdd:/data
     ports:
       - 6881:6881
       - 6881:6881/udp
@@ -35,7 +34,7 @@ services:
       - PLEX_CLAIM=claim-rnM64s9cZGeCkwuB8xws
     volumes:
       - /home/homeserver/.config/plex:/config
-      - /mnt/hdd/series:/tv
+      - /mnt/hdd/tv:/tv
       - /mnt/hdd/movies:/movies
       - /mnt/hdd/education:/education
     restart: unless-stopped
@@ -67,8 +66,7 @@ services:
       - TZ=America/Bogota
     volumes:
       - /home/homeserver/.config/sonarr:/config
-      - /mnt/hdd/series:/tv
-      - /mnt/hdd/downloads:/downloads
+      - /mnt/hdd:/data
     ports:
       - 8989:8989
     expose:
@@ -86,12 +84,29 @@ services:
       - TZ=America/Bogota
     volumes:
       - /home/homeserver/.config/bazarr:/config
-      - /mnt/hdd/movies:/movies
-      - /mnt/hdd/series:/tv
+      - /mnt/hdd:/data
     ports:
       - 6767:6767
     expose:
       - "6767"
+    networks:
+      - mediaserver
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Bogota
+    volumes:
+      - /home/homeserver/.config/radarr:/config
+      - /mnt/hdd:/data
+    ports:
+      - 7878:7878
+    expose:
+      - "7878"
     networks:
       - mediaserver
     restart: unless-stopped

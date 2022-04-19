@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx_proxy
+
+    network_mode: host
+    volumes:
+      - /opt/services/nginx-proxy/config/nginx-proxy.conf:/etc/nginx/conf.d/default.conf

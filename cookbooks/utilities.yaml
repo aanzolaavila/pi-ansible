@@ -8,6 +8,7 @@
         name: "{{item}}"
       loop:
         - cron
+        - socat
 
     - name: utilities services
       service:

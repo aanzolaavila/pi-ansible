@@ -22,6 +22,7 @@
         - mediaserver
         - homebridge
         - calibre-web
+        - nginx-proxy
 
     - name: directories
       file:
@@ -31,15 +32,31 @@
         - mediaserver
         - homebridge
         - calibre-web
+        - nginx-proxy
 
     - name: compose stacks
       copy:
-        src: files/{{item}}-compose.yaml
+        src: files/compose/{{item}}-compose.yaml
         dest: /opt/services/{{item}}/docker-compose.yaml
       loop:
         - mediaserver
         - homebridge
         - calibre-web
+        - nginx-proxy
+
+    - name: static config directories
+      file:
+        path: /opt/services/{{item}}/config
+        state: directory
+      loop:
+        - nginx-proxy
+
+    - name: static configs setup
+      copy:
+        src: files/configs/{{item}}.conf
+        dest: /opt/services/{{item}}/config/{{item}}.conf
+      loop:
+        - nginx-proxy
 
     - name: enable services
       systemd:
@@ -51,3 +68,4 @@
         - mediaserver
         - homebridge
         - calibre-web
+        - nginx-proxy
