@@ -14,7 +14,7 @@
         system: no
         createhome: yes
 
-    - name: docker compose templates
+    - name: docker compose services templates
       template:
         src: templates/docker-services.j2
         dest: /etc/systemd/system/{{item}}-compose.service

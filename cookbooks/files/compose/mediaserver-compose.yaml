@@ -2,7 +2,7 @@
 version: "2.1"
 services:
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent
+    image: lscr.io/linuxserver/qbittorrent:arm32v7-latest
     container_name: qbittorrent
     environment:
       - PUID=1000
@@ -24,7 +24,7 @@ services:
     restart: unless-stopped
 
   plex:
-    image: lscr.io/linuxserver/plex
+    image: lscr.io/linuxserver/plex:arm32v7-latest
     container_name: plex
     network_mode: host
     environment:
@@ -40,7 +40,7 @@ services:
     restart: unless-stopped
 
   jackett:
-    image: linuxserver/jackett
+    image: linuxserver/jackett:arm32v7-latest
     container_name: jackett
     environment:
       - PUID=0
@@ -77,7 +77,7 @@ services:
     restart: unless-stopped
 
   bazarr:
-    image: linuxserver/bazarr
+    image: linuxserver/bazarr:arm32v7-latest
     container_name: bazarr
     environment:
       - PUID=0
@@ -95,7 +95,7 @@ services:
     restart: unless-stopped
 
   radarr:
-    image: lscr.io/linuxserver/radarr
+    image: lscr.io/linuxserver/radarr:arm32v7-latest
     container_name: radarr
     environment:
       - PUID=1000
