@@ -23,6 +23,7 @@
         - homebridge
         - calibre-web
         - nginx-proxy
+        - pihole
 
     - name: directories
       file:
@@ -33,6 +34,7 @@
         - homebridge
         - calibre-web
         - nginx-proxy
+        - pihole
 
     - name: compose stacks
       copy:
@@ -43,6 +45,7 @@
         - homebridge
         - calibre-web
         - nginx-proxy
+        - pihole
 
     - name: static config directories
       file:
@@ -69,3 +72,4 @@
         - homebridge
         - calibre-web
         - nginx-proxy
+        - pihole
