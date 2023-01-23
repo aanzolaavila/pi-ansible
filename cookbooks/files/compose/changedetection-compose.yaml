@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  changedetection:
+    container_name: changedetection.io
+    image: dgtlmoon/changedetection.io
+    ports:
+      - "5000:5000"
+    volumes:
+      - '/home/homeserver/.config/changedetection:/datastore'
+    restart: unless-stopped
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge

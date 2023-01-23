@@ -24,6 +24,7 @@
         - calibre-web
         - nginx-proxy
         - pihole
+        - changedetection
 
     - name: directories
       file:
@@ -35,6 +36,7 @@
         - calibre-web
         - nginx-proxy
         - pihole
+        - changedetection
 
     - name: compose stacks
       copy:
@@ -46,6 +48,7 @@
         - calibre-web
         - nginx-proxy
         - pihole
+        - changedetection
 
     - name: static config directories
       file:
@@ -73,3 +76,4 @@
         - calibre-web
         - nginx-proxy
         - pihole
+        - changedetection
