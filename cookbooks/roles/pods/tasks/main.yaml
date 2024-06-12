@@ -11,9 +11,10 @@
 
 - name: Configure pods to run
   block:
-    - name: cleanup pods
-      shell: |
-        rm -rf /etc/kubelet.d/*
+    - name: Synchronization of src on the control machine to dest on the remote hosts
+      ansible.posix.synchronize:
+        src: ./
+        dest: /etc/kubelet.d
 
     - name: Copy pods specs
       copy:
