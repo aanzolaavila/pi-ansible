@@ -27,3 +27,11 @@
         name: vm.swappiness
         value: "0"
         state: present
+
+    - name: Disable journal storage to disk
+      community.general.ini_file:
+        path: /etc/systemd/journald.conf
+        section: Journal
+        option: Storage
+        value: volatile
+        backup: true
