@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: plex
+spec:
+  hostNetwork: true
+  restartPolicy: Always
+  containers:
+    - name: plex
+      image: lscr.io/linuxserver/plex:latest
+      env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: VERSION
+          value: "docker"
+        - name: PLEX_CLAIM
+          value: "claim-rnM64s9cZGeCkwuB8xws"
+      # ports:
+      #   - containerPort: 6881
+      #     protocol: TCP
+      #   - containerPort: 6881
+      #     protocol: UDP
+      #   - containerPort: 8080
+      volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: tv
+          mountPath: /tv
+        - name: movies
+          mountPath: /movies
+        - name: education
+          mountPath: /education
+  volumes:
+    - name: config
+      hostPath:
+        path: /home/homeserver/.config/plex
+        type: "DirectoryOrCreate"
+    - name: tv
+      hostPath:
+        path: /mnt/hdd/tv
+        type: "Directory"
+    - name: movies
+      hostPath:
+        path: /mnt/hdd/movies
+        type: "Directory"
+    - name: education
+      hostPath:
+        path: /mnt/hdd/education
+        type: "Directory"

@@ -1,3 +1,14 @@
+- name: Configure user for configs
+  user:
+    name: homeserver
+    password: "homeserver"
+    groups:
+      - docker
+    state: present
+    shell: /bin/bash
+    system: no
+    createhome: yes
+
 - name: Configure pods to run
   block:
     - name: cleanup pods
@@ -10,10 +21,8 @@
         dest: /etc/kubelet.d
       with_fileglob:
         - "*.yaml"
-      # notify: restart kubelet
 
-  # handlers:
-  #   - name: restart kubelet
-  #     service:
-  #       name: kubelet
-  #       state: restarted
+    - name: restart kubelet
+      service:
+        name: kubelet
+        state: restarted

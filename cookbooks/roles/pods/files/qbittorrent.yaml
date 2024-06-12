@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: qbittorrent
+spec:
+  hostNetwork: true
+  restartPolicy: Always
+  containers:
+    - name: qbittorrent
+      image: lscr.io/linuxserver/qbittorrent:latest
+      env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/Bogota"
+        - name: WEBUI_PORT
+          value: "8080"
+      ports:
+        - containerPort: 6881
+          protocol: TCP
+        - containerPort: 6881
+          protocol: UDP
+        - containerPort: 8080
+      volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: data
+          mountPath: /data
+  volumes:
+    - name: config
+      hostPath:
+        path: /home/homeserver/.config/qbittorrent
+        type: "DirectoryOrCreate"
+    - name: data
+      hostPath:
+        path: /mnt/hdd
+        type: "Directory"
