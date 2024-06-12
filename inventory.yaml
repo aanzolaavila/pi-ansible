@@ -1,0 +1,5 @@
+home:
+  hosts:
+    raspi5:
+      ansible_host: 192.168.0.111
+      ansible_user: aanzolaavila

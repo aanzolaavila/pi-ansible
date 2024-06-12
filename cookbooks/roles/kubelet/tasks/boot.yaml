@@ -1,0 +1,10 @@
+---
+# Reference: https://dalwar23.com/how-to-fix-no-memory-limit-support-for-docker-in-raspberry-pi/
+- name: Configure kernel to add cgroups for kubelet
+  block:
+    - name: Configure cmdline.txt
+      shell: |
+        printf "%s cgroup_enable=memory swapaccount=1 cgroup_memory=1 cgroup_enable=cpuset" "$(cat cmdline.txt)" > cmdline.txt
+      args:
+        chdir: /boot/firmware
+        executable: /bin/bash

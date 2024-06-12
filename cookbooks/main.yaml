@@ -1,7 +1,9 @@
 ---
-- import_playbook: base.yaml
-- import_playbook: gui.yaml
-- import_playbook: utilities.yaml
-- import_playbook: scripts.yaml
-- import_playbook: mounts.yaml
-- import_playbook: containers.yaml
+- hosts: all
+  become: yes
+  roles:
+    - base
+    - mounts
+    - log2ram
+    - docker
+    - kubelet

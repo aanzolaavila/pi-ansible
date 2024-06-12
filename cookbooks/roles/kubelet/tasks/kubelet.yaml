@@ -1,0 +1,169 @@
+- name: Remove swap
+  block:
+    - name: Write noswap systemd service config file
+      template:
+        src: noswap.service.j2
+        dest: /etc/systemd/system/noswap.service
+        owner: root
+        group: root
+        mode: 0644
+      notify: Enable noswap service
+
+    - name: disable dphys-swapfile service
+      service:
+        name: dphys-swapfile
+        state: stopped
+        enabled: false
+
+- name: Install Kubelet
+  block:
+    - name: disable SWAP (Kubeadm requirement)
+      shell: |
+        swapoff -a
+
+    - name: create an empty file for the Containerd module
+      copy:
+        content: ""
+        dest: /etc/modules-load.d/containerd.conf
+        force: no
+
+    - name: configure modules for Containerd
+      blockinfile:
+        path: /etc/modules-load.d/containerd.conf
+        block: |
+          overlay
+          br_netfilter
+
+    - name: create an empty file for Kubernetes sysctl params
+      copy:
+        content: ""
+        dest: /etc/sysctl.d/99-kubernetes-cri.conf
+        force: no
+
+    - name: configure sysctl params for Kubernetes
+      lineinfile:
+        path: /etc/sysctl.d/99-kubernetes-cri.conf
+        line: "{{ item }}"
+      with_items:
+        - "net.bridge.bridge-nf-call-iptables  = 1"
+        - "net.ipv4.ip_forward                 = 1"
+        - "net.bridge.bridge-nf-call-ip6tables = 1"
+
+    - name: add Kubernetes apt-key
+      ansible.builtin.get_url:
+        url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
+        dest: /etc/apt/keyrings/kubernetes-apt-keyring.asc
+        mode: "0644"
+        force: true
+
+    - name: apply sysctl params without reboot
+      command: sysctl --system
+
+    - name: add Kubernetes' APT repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /"
+        state: present
+        update_cache: yes
+
+    - name: install Containerd
+      ansible.builtin.apt:
+        name: containerd.io
+        state: present
+
+    - name: create Containerd directory
+      file:
+        path: /etc/containerd
+        state: directory
+
+    - name: add Containerd configuration
+      shell: /usr/bin/containerd config default > /etc/containerd/config.toml
+
+    - name: configuring the systemd cgroup driver for Containerd
+      lineinfile:
+        path: /etc/containerd/config.toml
+        regexp: "            SystemdCgroup = false"
+        line: "            SystemdCgroup = true"
+
+    - name: enable the Containerd service and start it
+      ansible.builtin.systemd:
+        name: containerd
+        state: started
+        enabled: yes
+        daemon-reload: yes
+
+    - name: install Kubelet
+      ansible.builtin.apt:
+        name: kubelet=1.29.*
+        state: present
+        update_cache: true
+
+    - name: install Kubeadm
+      ansible.builtin.apt:
+        name: kubeadm=1.29.*
+        state: absent
+
+    - name: Write kubelet systemd service config file
+      ansible.builtin.template:
+        src: files/kubelet.service.j2
+        dest: /etc/systemd/system/kubelet.service
+        owner: root
+        group: root
+        mode: 0644
+      notify: Restart Kubelet
+
+    - name: Copy Kubelet config
+      ansible.builtin.copy:
+        src: files/kubelet-config.yaml
+        dest: /etc/kubernetes/kubelet-config.yaml
+        mode: 0444
+      notify: Restart Kubelet
+
+    - name: enable the Kubelet service, and enable it persistently
+      ansible.builtin.service:
+        name: kubelet
+        enabled: yes
+        state: started
+        daemon-reload: yes
+
+    - name: load br_netfilter kernel module
+      modprobe:
+        name: br_netfilter
+        state: present
+
+    - name: set bridge-nf-call-iptables
+      sysctl:
+        name: net.bridge.bridge-nf-call-iptables
+        value: 1
+
+    - name: set ip_forward
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+
+    - name: Check if reboot required
+      stat:
+        path: /var/run/reboot-required
+      register: reboot_required_file
+
+    - name: Reboot if required
+      reboot:
+      when: reboot_required_file.stat.exists == true
+
+- name: Install Nerdctl
+  block:
+    - name: Create dest directory
+      file:
+        path: /tmp/nerdctl
+        state: directory
+
+    - name: Decompress archive
+      ansible.builtin.unarchive:
+        src: https://github.com/containerd/nerdctl/releases/download/v1.7.6/nerdctl-full-1.7.6-linux-arm64.tar.gz
+        dest: /tmp/nerdctl
+        mode: "0555"
+        remote_src: yes
+
+    - name: Copy contents to /usr/bin
+      ansible.builtin.shell: |
+        chmod +rx /tmp/nerdctl/bin/*
+        mv /tmp/nerdctl/bin/* /usr/bin

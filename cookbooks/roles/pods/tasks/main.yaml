@@ -1,0 +1,15 @@
+- name: Configure pods to run
+  block:
+    - name: Copy pods specs
+      copy:
+        src: "{{item}}"
+        dest: /etc/kubernetes/manifests
+      with_fileglob:
+        - "*.yaml"
+      notify: restart kubelet
+
+  handlers:
+    - name: restart kubelet
+      service:
+        name: kubelet
+        state: restarted

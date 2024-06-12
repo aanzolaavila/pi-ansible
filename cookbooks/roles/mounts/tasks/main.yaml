@@ -1,8 +1,5 @@
----
 - name: Mount points at boot time
-  hosts: all
-  become: yes
-  tasks:
+  block:
     - name: Store HDD
       mount:
         path: /mnt/hdd

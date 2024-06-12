@@ -1,0 +1,28 @@
+- name: Install and configure Log2Ram
+  block:
+    - name: Download GPG key
+      ansible.builtin.get_url:
+        url: https://azlux.fr/repo.gpg
+        dest: /etc/apt/keyrings/azlux-archive-keyring.gpg
+
+    - name: Add specified repository into sources list
+      ansible.builtin.apt_repository:
+        repo: deb [signed-by=/etc/apt/keyrings/azlux-archive-keyring.gpg] http://packages.azlux.fr/debian/ bookworm main
+        filename: /etc/apt/sources.list.d/azlux.list
+        state: present
+
+    - name: Install log2ram
+      ansible.builtin.apt:
+        name: log2ram
+        state: present
+
+    - name: Copy log2ram config
+      ansible.builtin.copy:
+        src: log2ram.conf
+        dest: /etc/log2ram.conf
+
+    - name: Disable daily timer
+      ansible.builtin.systemd_service:
+        name: log2ram-daily.timer
+        state: stopped
+        enabled: false
