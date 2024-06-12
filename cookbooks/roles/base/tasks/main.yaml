@@ -20,6 +20,7 @@
         - python3
         - python3-pip
         - magic-wormhole
+        - 7zip
 
     - name: set system swapiness
       ansible.posix.sysctl:

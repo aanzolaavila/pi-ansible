@@ -7,7 +7,12 @@
         owner: root
         group: root
         mode: 0644
-      notify: Enable noswap service
+
+    - name: enable noswap service
+      service:
+        name: noswap
+        state: started
+        enabled: true
 
     - name: disable dphys-swapfile service
       service:
@@ -15,7 +20,7 @@
         state: stopped
         enabled: false
 
-- name: Install Kubelet
+- name: Configure Kubernetes systemwide
   block:
     - name: disable SWAP (Kubeadm requirement)
       shell: |
@@ -65,65 +70,43 @@
         state: present
         update_cache: yes
 
-    - name: install Containerd
-      ansible.builtin.apt:
-        name: containerd.io
-        state: present
+- name: Install Kubelet
+  block:
+    # - name: install Containerd
+    #   ansible.builtin.apt:
+    #     name: containerd.io
+    #     state: present
 
-    - name: create Containerd directory
-      file:
-        path: /etc/containerd
-        state: directory
+    # - name: create Containerd directory
+    #   file:
+    #     path: /etc/containerd
+    #     state: directory
 
-    - name: add Containerd configuration
-      shell: /usr/bin/containerd config default > /etc/containerd/config.toml
+    # - name: add Containerd configuration
+    #   shell: /usr/bin/containerd config default > /etc/containerd/config.toml
+    #
+    # - name: configuring the systemd cgroup driver for Containerd
+    #   lineinfile:
+    #     path: /etc/containerd/config.toml
+    #     regexp: "            SystemdCgroup = false"
+    #     line: "            SystemdCgroup = true"
 
-    - name: configuring the systemd cgroup driver for Containerd
-      lineinfile:
-        path: /etc/containerd/config.toml
-        regexp: "            SystemdCgroup = false"
-        line: "            SystemdCgroup = true"
-
-    - name: enable the Containerd service and start it
-      ansible.builtin.systemd:
-        name: containerd
-        state: started
-        enabled: yes
-        daemon-reload: yes
+    # - name: enable the Containerd service and start it
+    #   ansible.builtin.systemd:
+    #     name: containerd
+    #     state: started
+    #     enabled: yes
+    #     daemon-reload: yes
 
     - name: install Kubelet
+      loop:
+        - kubelet
+        - kubeadm
+        - kubernetes-cni
       ansible.builtin.apt:
-        name: kubelet=1.29.*
+        name: "{{item}}"
         state: present
         update_cache: true
-
-    - name: install Kubeadm
-      ansible.builtin.apt:
-        name: kubeadm=1.29.*
-        state: absent
-
-    - name: Write kubelet systemd service config file
-      ansible.builtin.template:
-        src: files/kubelet.service.j2
-        dest: /etc/systemd/system/kubelet.service
-        owner: root
-        group: root
-        mode: 0644
-      notify: Restart Kubelet
-
-    - name: Copy Kubelet config
-      ansible.builtin.copy:
-        src: files/kubelet-config.yaml
-        dest: /etc/kubernetes/kubelet-config.yaml
-        mode: 0444
-      notify: Restart Kubelet
-
-    - name: enable the Kubelet service, and enable it persistently
-      ansible.builtin.service:
-        name: kubelet
-        enabled: yes
-        state: started
-        daemon-reload: yes
 
     - name: load br_netfilter kernel module
       modprobe:
@@ -140,14 +123,64 @@
         name: net.ipv4.ip_forward
         value: 1
 
-    - name: Check if reboot required
-      stat:
-        path: /var/run/reboot-required
-      register: reboot_required_file
+# - name: Setup CNI plugins
+#   block:
+# - name: Git checkout container networking
+#   ansible.builtin.git:
+#     repo: "https://github.com/containernetworking/plugins"
+#     dest: /tmp/plugins
+#     version: v1.5.0
+#
+# - ansible.builtin.file:
+#     path: /opt/cni/bin
+#     state: directory
+#
+# - name: Build plugins
+#   ansible.builtin.shell: |
+#     ./build_linux.sh
+#     cp bin/* /opt/cni/bin/
+#   args:
+#     chdir: /tmp/plugins
+#     executable: /bin/bash
+#
+# - name: Copy configuration for networking plugin
+#   ansible.builtin.get_url:
+#     url: https://raw.githubusercontent.com/cri-o/cri-o/v1.30.2/contrib/cni/10-crio-bridge.conflist
+#     dest: /etc/cni/net.d/10-crio-bridge.conflist
 
-    - name: Reboot if required
-      reboot:
-      when: reboot_required_file.stat.exists == true
+- name: Configure Kubelet
+  block:
+    - name: Create config files
+      copy:
+        src: .
+        dest: /
+        owner: root
+        group: root
+        mode: "0444"
+    - name: Create kubelet startup options file
+      template:
+        src: kubelet.j2
+        dest: /etc/kubernetes/kubelet
+    - name: Create static pod directory
+      file:
+        path: /etc/kubelet.d
+        state: directory
+    - name: Create docker data directory
+      file:
+        path: /mnt/docker
+        state: directory
+    - name: Restart container services
+      loop:
+        - docker
+        - cri-docker.service
+        - kubelet
+      systemd:
+        name: "{{ item }}"
+        state: restarted
+        daemon_reload: true
+        enabled: yes
+    - name: wait for kubelet to start
+      wait_for: port=10250 timeout=60
 
 - name: Install Nerdctl
   block:

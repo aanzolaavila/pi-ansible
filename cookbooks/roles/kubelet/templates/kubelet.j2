@@ -14,7 +14,7 @@ KUBELET_HOSTNAME="--hostname-override=127.0.0.1"
 # KUBELET_KUBECONFIG="--kubeconfig=/etc/kubernetes/kubelet.kubeconfig"
 
 # Add your own!
-KUBELET_ARGS="--cgroup-driver=systemd --fail-swap-on=false --config=/var/lib//kubelet/config.yaml --container-runtime-endpoint=unix:///var/run/cri-dockerd.sock{% if tcfv1_allow_unsafe_sysctls %} --allowed-unsafe-sysctls '{{ tcfv1_allow_unsafe_sysctls }}'{% endif %}"
+KUBELET_ARGS="--cgroup-driver=systemd --fail-swap-on=false --config=/var/lib/kubelet/config.yaml --container-runtime-endpoint=unix:///var/run/cri-dockerd.sock"
 
 # Use root's home directory so we pick up ~/.docker/config.json's auth creds
 HOME=/root

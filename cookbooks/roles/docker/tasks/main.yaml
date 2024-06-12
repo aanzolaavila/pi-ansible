@@ -42,6 +42,13 @@
         dest: /usr/local/bin/docker-compose
         mode: "u+x,g+x"
 
+# We set all docker configuration on daemon.json
+# - name: Remove default flags for docker daemon
+#   lineinfile:
+#     path: /etc/sysconfig/docker
+#     regexp: "^OPTIONS="
+#     line: 'OPTIONS=""'
+
 - name: Configure CRI Docker
   block:
     - name: Decompress archive
@@ -52,7 +59,7 @@
         remote_src: yes
 
     - name: Move binary to /usr/bin
-      shell: |
+      ansible.builtin.shell: |
         mv /tmp/cri-dockerd/cri-dockerd /usr/bin/cri-dockerd
 
     - name: Download cri-docker services files
@@ -73,22 +80,3 @@
       loop:
         - cri-docker.service
         - cri-docker.socket
-
-    - name: Git checkout container networking
-      ansible.builtin.git:
-        repo: "https://github.com/containernetworking/plugins"
-        dest: /tmp/plugins
-        version: v1.5.0
-
-    - name: Build plugins
-      ansible.builtin.shell: |
-        ./build_linux.sh
-        cp bin/* /opt/cni/bin/
-      args:
-        chdir: /tmp/plugins
-        executable: /bin/bash
-
-    - name: Copy configuration for networking plugin
-      ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/cri-o/cri-o/v1.30.2/contrib/cni/10-crio-bridge.conflist
-        dest: /etc/cni/net.d/10-crio-bridge.conflist
