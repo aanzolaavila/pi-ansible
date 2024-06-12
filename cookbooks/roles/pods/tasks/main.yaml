@@ -1,5 +1,9 @@
 - name: Configure pods to run
   block:
+    - name: cleanup pods
+      shell: |
+        rm -rf /etc/kubelet.d/*
+
     - name: Copy pods specs
       copy:
         src: "{{item}}"
