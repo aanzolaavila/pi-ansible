@@ -21,8 +21,3 @@
         dest: /etc/kubelet.d
       with_fileglob:
         - "*.yaml"
-
-    - name: restart kubelet
-      service:
-        name: kubelet
-        state: restarted
