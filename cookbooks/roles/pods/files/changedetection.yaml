@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: changedetection.io
+spec:
+  hostNetwork: true
+  restartPolicy: Always
+  containers:
+    - name: changedetection
+      image: dgtlmoon/changedetection.io:latest
+      ports:
+        - containerPort: 5000
+          protocol: TCP
+      volumeMounts:
+        - name: datastore
+          mountPath: /datastore
+  volumes:
+    - name: datastore
+      hostPath:
+        path: /home/homeserver/.config/changedetection
+        type: "DirectoryOrCreate"

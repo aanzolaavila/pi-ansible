@@ -72,32 +72,6 @@
 
 - name: Install Kubelet
   block:
-    # - name: install Containerd
-    #   ansible.builtin.apt:
-    #     name: containerd.io
-    #     state: present
-
-    # - name: create Containerd directory
-    #   file:
-    #     path: /etc/containerd
-    #     state: directory
-
-    # - name: add Containerd configuration
-    #   shell: /usr/bin/containerd config default > /etc/containerd/config.toml
-    #
-    # - name: configuring the systemd cgroup driver for Containerd
-    #   lineinfile:
-    #     path: /etc/containerd/config.toml
-    #     regexp: "            SystemdCgroup = false"
-    #     line: "            SystemdCgroup = true"
-
-    # - name: enable the Containerd service and start it
-    #   ansible.builtin.systemd:
-    #     name: containerd
-    #     state: started
-    #     enabled: yes
-    #     daemon-reload: yes
-
     - name: install Kubelet
       loop:
         - kubelet
@@ -123,30 +97,17 @@
         name: net.ipv4.ip_forward
         value: 1
 
-# - name: Setup CNI plugins
-#   block:
-# - name: Git checkout container networking
-#   ansible.builtin.git:
-#     repo: "https://github.com/containernetworking/plugins"
-#     dest: /tmp/plugins
-#     version: v1.5.0
-#
-# - ansible.builtin.file:
-#     path: /opt/cni/bin
-#     state: directory
-#
-# - name: Build plugins
-#   ansible.builtin.shell: |
-#     ./build_linux.sh
-#     cp bin/* /opt/cni/bin/
-#   args:
-#     chdir: /tmp/plugins
-#     executable: /bin/bash
-#
-# - name: Copy configuration for networking plugin
-#   ansible.builtin.get_url:
-#     url: https://raw.githubusercontent.com/cri-o/cri-o/v1.30.2/contrib/cni/10-crio-bridge.conflist
-#     dest: /etc/cni/net.d/10-crio-bridge.conflist
+- name: Setup CNI plugins
+  block:
+    - ansible.builtin.file:
+        path: /opt/cni/bin
+        state: directory
+
+    - name: Decompress archive
+      ansible.builtin.unarchive:
+        src: "https://github.com/containernetworking/plugins/releases/download/v1.5.0/cni-plugins-linux-arm64-v1.5.0.tgz"
+        dest: /opt/cni/bin
+        remote_src: true
 
 - name: Configure Kubelet
   block:
@@ -181,22 +142,3 @@
         enabled: yes
     - name: wait for kubelet to start
       wait_for: port=10250 timeout=60
-
-- name: Install Nerdctl
-  block:
-    - name: Create dest directory
-      file:
-        path: /tmp/nerdctl
-        state: directory
-
-    - name: Decompress archive
-      ansible.builtin.unarchive:
-        src: https://github.com/containerd/nerdctl/releases/download/v1.7.6/nerdctl-full-1.7.6-linux-arm64.tar.gz
-        dest: /tmp/nerdctl
-        mode: "0555"
-        remote_src: yes
-
-    - name: Copy contents to /usr/bin
-      ansible.builtin.shell: |
-        chmod +rx /tmp/nerdctl/bin/*
-        mv /tmp/nerdctl/bin/* /usr/bin

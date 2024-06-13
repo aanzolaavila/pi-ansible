@@ -15,10 +15,3 @@
       ansible.posix.synchronize:
         src: ./
         dest: /etc/kubelet.d
-
-    - name: Copy pods specs
-      copy:
-        src: "{{item}}"
-        dest: /etc/kubelet.d
-      with_fileglob:
-        - "*.yaml"
