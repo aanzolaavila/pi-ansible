@@ -10,9 +10,9 @@ spec:
       image: lscr.io/linuxserver/qbittorrent:latest
       env:
         - name: PUID
-          value: "1000"
+          value: "1001"
         - name: PGID
-          value: "1000"
+          value: "1001"
         - name: TZ
           value: "America/Bogota"
         - name: WEBUI_PORT

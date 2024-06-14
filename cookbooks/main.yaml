@@ -7,3 +7,4 @@
     - log2ram
     - docker
     - kubelet
+    - pods

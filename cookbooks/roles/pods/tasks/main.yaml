@@ -6,8 +6,42 @@
       - docker
     state: present
     shell: /bin/bash
+    uid: 1001
     system: no
     createhome: yes
+
+- name: Create loop filesystems
+  block:
+    - name: Check that the /mnt/hdd/raspifs/drive exists
+      stat:
+        path: /mnt/hdd/raspifs/drive
+        get_checksum: false
+        get_mime: false
+      register: stat_result
+
+    - name: Create the file, if it doesnt exist already
+      shell: |
+        touch drive
+        dd if=/dev/zero of=drive bs=1024 count=5000000 # ~5GB
+        mkfs.ext3 drive
+      args:
+        chdir: /mnt/hdd/raspifs
+        executable: /bin/bash
+      when: not stat_result.stat.exists
+
+- name: Mount loop filesystems
+  block:
+    - name: Ensure config directory exists
+      file:
+        path: /home/homeserver/.config
+        state: directory
+
+    - name: mediaserver config
+      mount:
+        src: /mnt/hdd/raspifs/drive
+        path: /home/homeserver/.config
+        state: mounted
+        fstype: loop
 
 - name: Configure pods to run
   block:
@@ -15,3 +49,17 @@
       ansible.posix.synchronize:
         src: ./
         dest: /etc/kubelet.d
+
+- name: ensure services are running
+  block:
+    - name: Start container services
+      loop:
+        - docker
+        - cri-docker.service
+        - kubelet
+      systemd:
+        name: "{{ item }}"
+        state: started
+
+    - name: wait for kubelet to start
+      wait_for: port=10250 timeout=60

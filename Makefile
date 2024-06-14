@@ -9,3 +9,7 @@ verify:
 .PHONY: apply
 apply:
 	ansible-playbook -i inventory.yaml cookbooks/main.yaml
+
+.PHONY: pods
+pods:
+	ansible-playbook -i inventory.yaml cookbooks/pods.yaml
