@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: media
+spec:
+  hostNetwork: true
+  restartPolicy: Always
+  containers:
+    - name: jackett
+      image: linuxserver/jackett:latest
+      env: &environment
+        - name: PUID
+          value: "1001"
+        - name: PGID
+          value: "1001"
+        - name: TZ
+          value: "America/Bogota"
+      ports:
+        - containerPort: 9117
+          hostPort: 9117
+          protocol: TCP
+      volumeMounts:
+        - name: jackett-config
+          mountPath: /config
+        - name: jackett-download
+          mountPath: /downloads
+    - name: bazarr
+      image: linuxserver/bazarr:latest
+      env: *environment
+      ports:
+        - containerPort: 6767
+          hostPort: 6767
+          protocol: TCP
+      volumeMounts:
+        - name: bazarr-config
+          mountPath: /config
+        - name: tv-data
+          mountPath: /data/tv
+        - name: movie-data
+          mountPath: /data/movies
+
+    - name: sonarr
+      image: linuxserver/sonarr:latest
+      env: *environment
+      ports:
+        - containerPort: 8989
+          hostPort: 8989
+          protocol: TCP
+      volumeMounts:
+        - name: sonarr-config
+          mountPath: /config
+        - name: tv-data
+          mountPath: /data/tv
+    - name: radarr
+      image: linuxserver/radarr:latest
+      env: *environment
+      ports:
+        - containerPort: 7878
+          hostPort: 7878
+          protocol: TCP
+      volumeMounts:
+        - name: radarr-config
+          mountPath: /config
+        - name: movie-data
+          mountPath: /data/movies
+
+  volumes:
+    - name: jackett-config
+      hostPath:
+        path: /home/homeserver/.config/jackett
+        type: "DirectoryOrCreate"
+    - name: sonarr-config
+      hostPath:
+        path: /home/homeserver/.config/sonarr
+        type: "DirectoryOrCreate"
+    - name: bazarr-config
+      hostPath:
+        path: /home/homeserver/.config/bazarr
+        type: "DirectoryOrCreate"
+    - name: radarr-config
+      hostPath:
+        path: /home/homeserver/.config/radarr
+        type: "DirectoryOrCreate"
+    - name: jackett-download
+      hostPath:
+        path: /mnt/hdd/mediaserver/jackett
+        type: "DirectoryOrCreate"
+    - name: tv-data
+      hostPath:
+        path: /mnt/hdd/mediaserver/tv
+        type: "Directory"
+    - name: movie-data
+      hostPath:
+        path: /mnt/hdd/mediaserver/movies
+        type: "Directory"

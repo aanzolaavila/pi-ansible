@@ -36,18 +36,25 @@
         path: /home/homeserver/.config
         state: directory
 
-    - name: mediaserver config
-      mount:
-        src: /mnt/hdd/raspifs/drive
-        path: /home/homeserver/.config
-        state: mounted
-        fstype: loop
+    - name: copy mount service
+      copy:
+        src: mounts/home-homeserver-.config.mount
+        dest: /etc/systemd/system/
+        owner: root
+        group: root
+        mode: "0444"
+
+    - name: configure mount service
+      service:
+        name: home-homeserver-.config.mount
+        state: started
+        enabled: true
 
 - name: Configure pods to run
   block:
     - name: Synchronization of src on the control machine to dest on the remote hosts
       ansible.posix.synchronize:
-        src: ./
+        src: specs/
         dest: /etc/kubelet.d
 
 - name: ensure services are running

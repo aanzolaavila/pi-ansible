@@ -1,0 +1,13 @@
+[Unit]
+Description=Automount homeserver config
+Before=kubelet.service
+After=mnt-hdd.mount
+
+[Mount]
+What=/mnt/hdd/raspifs/drive
+Where=/home/homeserver/.config
+Type=ext3
+Options=rw,noatime
+
+[Install]
+WantedBy=multi-user.target

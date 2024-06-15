@@ -8,6 +8,11 @@ spec:
   containers:
     - name: qbittorrent
       image: lscr.io/linuxserver/qbittorrent:latest
+      resources:
+        requests:
+          memory: "500Mi"
+        limits:
+          memory: "1Gi"
       env:
         - name: PUID
           value: "1001"
@@ -28,7 +33,7 @@ spec:
         - name: config
           mountPath: /config
         - name: data
-          mountPath: /data
+          mountPath: /downloads
   volumes:
     - name: config
       hostPath:
@@ -36,5 +41,5 @@ spec:
         type: "DirectoryOrCreate"
     - name: data
       hostPath:
-        path: /mnt/hdd
+        path: /mnt/hdd/mediaserver
         type: "Directory"

@@ -28,10 +28,13 @@ spec:
           mountPath: /config
         - name: tv
           mountPath: /tv
+          readOnly: true
         - name: movies
           mountPath: /movies
+          readOnly: true
         - name: education
           mountPath: /education
+          readOnly: true
   volumes:
     - name: config
       hostPath:
@@ -39,13 +42,13 @@ spec:
         type: "DirectoryOrCreate"
     - name: tv
       hostPath:
-        path: /mnt/hdd/tv
+        path: /mnt/hdd/mediaserver/tv
         type: "Directory"
     - name: movies
       hostPath:
-        path: /mnt/hdd/movies
+        path: /mnt/hdd/mediaserver/movies
         type: "Directory"
     - name: education
       hostPath:
-        path: /mnt/hdd/education
+        path: /mnt/hdd/mediaserver/education
         type: "Directory"

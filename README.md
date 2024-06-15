@@ -8,3 +8,5 @@ TODOs
 - [ ] Make sure that disk writes are always outside of system disk
     - [ ] If possible also limit data flushing to disk as much as possible on kernel configuration
 - [ ] Set docker container locations into volatile locations or a place inside the external drive
+- [ ] Configure system for more agressive disk caching
+      https://unix.stackexchange.com/questions/30286/can-i-configure-my-linux-system-for-more-aggressive-file-system-caching
