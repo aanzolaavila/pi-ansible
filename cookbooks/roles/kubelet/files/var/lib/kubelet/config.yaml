@@ -3,7 +3,9 @@ kind: KubeletConfiguration
 serializeImagePulls: false
 address: 127.0.0.1
 cgroupDriver: systemd
-fileCheckFrequency: 10s
+failSwapOn: false
+containerRuntimeEndpoint: unix:///var/run/cri-dockerd.sock
+fileCheckFrequency: 30s
 readOnlyPort: 10255
 staticPodPath: /etc/kubelet.d
 authentication:

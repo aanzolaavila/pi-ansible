@@ -21,6 +21,10 @@
         - python3-pip
         - magic-wormhole
         - 7zip
+        - btop
+        - glances
+        - nmon
+        - fatrace
 
     - name: set system swapiness
       ansible.posix.sysctl:
@@ -35,3 +39,11 @@
         option: Storage
         value: volatile
         backup: true
+
+    - name: Set tmpfs mount for /tmp
+      mount:
+        path: /tmp
+        src: tmpfs
+        state: mounted
+        fstype: tmpfs
+        opts: size=500M

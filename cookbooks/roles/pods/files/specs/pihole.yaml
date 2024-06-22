@@ -19,6 +19,8 @@ spec:
           value: "1.1.1.1;1.0.0.1;9.9.9.9;149.112.112.112"
         - name: DNSMASQ_LISTENING
           value: "all"
+        - name: ServerIP
+          value: "192.168.0.111"
         - name: WEB_PORT
           value: "700"
       ports:

@@ -31,7 +31,7 @@
 
 - name: Mount loop filesystems
   block:
-    - name: Ensure config directory exists
+    - name: ensure config directory exists
       file:
         path: /home/homeserver/.config
         state: directory
@@ -52,6 +52,16 @@
 
 - name: Configure pods to run
   block:
+    - name: ensure config directory exists
+      file:
+        path: /etc/kubelet.conf.d
+        state: directory
+
+    - name: Copy container configs
+      ansible.posix.synchronize:
+        src: configs/
+        dest: /etc/kubelet.conf.d
+
     - name: Synchronization of src on the control machine to dest on the remote hosts
       ansible.posix.synchronize:
         src: specs/
@@ -63,10 +73,14 @@
       loop:
         - docker
         - cri-docker.service
-        - kubelet
       systemd:
         name: "{{ item }}"
         state: started
+
+    - name: Restart Kubelet
+      systemd:
+        name: "kubelet"
+        state: restarted
 
     - name: wait for kubelet to start
       wait_for: port=10250 timeout=60

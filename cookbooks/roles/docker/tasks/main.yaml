@@ -1,4 +1,38 @@
 ---
+- name: Set mounts and symlinks
+  block:
+    - loop:
+        - docker
+        - kubelet
+      ansible.builtin.file:
+        path: /mnt/ssd/{{ item }}
+        state: directory
+
+    - name: Set symlink for docker
+      loop:
+        - docker
+        - kubelet
+      ansible.builtin.file:
+        src: /mnt/ssd/{{ item }}
+        dest: /var/lib/{{ item }}
+        state: link
+
+    - name: Set tmpfs mount for containerd
+      mount:
+        path: /var/lib/containerd
+        src: tmpfs
+        state: mounted
+        fstype: tmpfs
+        opts: size=5M
+
+- name: Docker Cronjobs
+  block:
+    - name: Docker cleanup
+      ansible.builtin.cron:
+        name: "docker prune"
+        special_time: hourly
+        job: "docker system prune -a"
+
 - name: Docker installation
   block:
     - name: add docker GPG
@@ -31,6 +65,7 @@
       loop:
         - docker.service
         - docker.socket
+        - containerd
       service:
         name: "{{item}}"
         state: started

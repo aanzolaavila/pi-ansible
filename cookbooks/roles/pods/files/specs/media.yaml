@@ -7,7 +7,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: jackett
-      image: linuxserver/jackett:latest
+      image: linuxserver/jackett:0.22.175
       env: &environment
         - name: PUID
           value: "1001"
@@ -25,7 +25,7 @@ spec:
         - name: jackett-download
           mountPath: /downloads
     - name: bazarr
-      image: linuxserver/bazarr:latest
+      image: linuxserver/bazarr:1.4.3
       env: *environment
       ports:
         - containerPort: 6767
@@ -40,7 +40,7 @@ spec:
           mountPath: /data/movies
 
     - name: sonarr
-      image: linuxserver/sonarr:latest
+      image: linuxserver/sonarr:4.0.5
       env: *environment
       ports:
         - containerPort: 8989
@@ -52,7 +52,7 @@ spec:
         - name: tv-data
           mountPath: /data/tv
     - name: radarr
-      image: linuxserver/radarr:latest
+      image: linuxserver/radarr:5.7.0
       env: *environment
       ports:
         - containerPort: 7878
@@ -63,6 +63,44 @@ spec:
           mountPath: /config
         - name: movie-data
           mountPath: /data/movies
+
+    # - name: overseer
+    #   image: sctx/overseerr:latest
+    #   env:
+    #     - name: TZ
+    #       value: "America/Bogota"
+    #     - name: PORT
+    #       value: "5055"
+    #   ports:
+    #     - containerPort: 5055
+    #       hostPort: 5055
+    #   volumeMounts:
+    #     - name: overseer-config
+    #       mountPath: /app/config
+
+    - name: jellyseer
+      image: fallenbagel/jellyseerr:1.9.2
+      env:
+        - name: TZ
+          value: "America/Bogota"
+        - name: PORT
+          value: "5056"
+      ports:
+        - containerPort: 5056
+          hostPort: 5056
+      volumeMounts:
+        - name: jellyseer-config
+          mountPath: /app/config
+
+    - name: tautulli
+      image: lscr.io/linuxserver/tautulli:latest
+      env: *environment
+      ports:
+        - containerPort: 8181
+          hostPort: 8181
+      volumeMounts:
+        - name: tautulli-config
+          mountPath: /config
 
   volumes:
     - name: jackett-config
@@ -80,6 +118,18 @@ spec:
     - name: radarr-config
       hostPath:
         path: /home/homeserver/.config/radarr
+        type: "DirectoryOrCreate"
+    # - name: overseer-config
+    #   hostPath:
+    #     path: /home/homeserver/.config/overseer
+    #     type: "DirectoryOrCreate"
+    - name: jellyseer-config
+      hostPath:
+        path: /home/homeserver/.config/jellyseer
+        type: "DirectoryOrCreate"
+    - name: tautulli-config
+      hostPath:
+        path: /home/homeserver/.config/jellyseer
         type: "DirectoryOrCreate"
     - name: jackett-download
       hostPath:

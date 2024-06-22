@@ -14,7 +14,7 @@ KUBELET_ADDRESS="--address=0.0.0.0"
 # KUBELET_KUBECONFIG="--kubeconfig=/etc/kubernetes/kubelet.kubeconfig"
 
 # Add your own!
-KUBELET_ARGS="--cgroup-driver=systemd --fail-swap-on=false --config=/var/lib/kubelet/config.yaml --container-runtime-endpoint=unix:///var/run/cri-dockerd.sock"
+KUBELET_ARGS="--config=/var/lib/kubelet/config.yaml"
 
 # Use root's home directory so we pick up ~/.docker/config.json's auth creds
 HOME=/root

@@ -7,3 +7,10 @@
         src: UUID=5E66-6BB1
         fstype: exfat
         opts: umask=0000
+
+    - name: Store SSD
+      mount:
+        path: /mnt/ssd
+        state: mounted
+        src: UUID=5a006874-a96a-4822-86e6-6e75c5c44861
+        fstype: ext4
