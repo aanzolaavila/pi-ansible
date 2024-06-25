@@ -1,0 +1,163 @@
+# version: '3'
+#  services:
+#    prometheus:
+#      image: prom/prometheus
+#      volumes:
+#        - ./prometheus.yml:/etc/prometheus/prometheus.yml
+#      command:
+#        - '--config.file=/etc/prometheus/prometheus.yml'
+#      ports:
+#        - 9090:9090
+#    grafana:
+#      image: grafana/grafana
+#      ports:
+#        - 3000:3000
+#    node-exporter:
+#      image: prom/node-exporter
+#      volumes:
+#        - /proc:/host/proc:ro
+#        - /sys:/host/sys:ro
+#        - /:/rootfs:ro
+#      command:
+#        - '--path.procfs=/host/proc'
+#        - '--path.sysfs=/host/sys'
+#        - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+#    cadvisor:
+#      image: google/cadvisor
+#      volumes:
+#        - /:/rootfs:ro
+#        - /var/run:/var/run:rw
+#        - /sys:/sys:ro
+#        - /var/lib/docker/:/var/lib/docker:ro
+#      ports:
+#        - 8080:8080
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: telemetry
+spec:
+  hostNetwork: true
+  restartPolicy: Always
+  securityContext:
+    runAsUser: 1001
+    runAsGroup: 1001
+
+  initContainers:
+    - name: change-grafana-dir-ownership
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      image: alpine:3
+      command:
+        - chown
+        - -R
+        - 1001:1001
+        - /var/lib/grafana
+      volumeMounts:
+        - name: grafana-data
+          mountPath: /var/lib/grafana
+
+  containers:
+    - name: grafana
+      image: grafana/grafana:latest
+      ports:
+        - containerPort: 3000
+          hostPort: 3000
+          protocol: TCP
+      volumeMounts:
+        - name: grafana-data
+          mountPath: /var/lib/grafana
+
+    - name: prometheus
+      image: prom/prometheus:latest
+      args: ["--config.file=/etc/prometheus/prometheus.yaml"]
+      securityContext:
+        # prometheus sets owner of everything inside its container to nobody user
+        # https://github.com/prometheus/prometheus/blob/main/Dockerfile#L19
+        runAsUser: 65534 # nobody user
+        runAsGroup: 65534
+      ports:
+        - containerPort: 9090
+          hostPort: 9090
+          protocol: TCP
+      volumeMounts:
+        - name: prometheus-config
+          mountPath: /etc/prometheus/prometheus.yaml
+          readOnly: true
+
+    - name: node-exporter
+      image: prom/node-exporter:latest
+      args:
+        [
+          "--path.procfs=/host/proc",
+          "--path.sysfs=/host/sys",
+          "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)",
+        ]
+      ports:
+        - containerPort: 9100
+          hostPort: 9100
+          protocol: TCP
+      volumeMounts:
+        - name: proc
+          mountPath: /host/proc
+          readOnly: true
+        - name: sys
+          mountPath: /host/sys
+          readOnly: true
+        - name: rootfs
+          mountPath: /rootfs
+          readOnly: true
+
+    - name: cadvisor
+      image: gcr.io/cadvisor/cadvisor-arm64:v0.45.0
+      command: ["/usr/bin/cadvisor"]
+      args: ["-port=9200", "-logtostderr"]
+      ports:
+        - containerPort: 9200
+          hostPort: 9200
+      volumeMounts:
+        - name: rootfs
+          mountPath: /rootfs
+          readOnly: true
+        - name: sys
+          mountPath: /host/sys
+          readOnly: true
+
+        - name: var-run
+          mountPath: /var/run # this is rw
+        - name: var-lib-docker
+          mountPath: /var/lib/docker
+          readOnly: true
+
+  volumes:
+    - name: prometheus-config
+      hostPath:
+        path: /etc/kubelet.conf.d/prometheus/prometheus.yaml
+        type: "File"
+    - name: grafana-data
+      hostPath:
+        path: /home/homeserver/.config/grafana
+        type: DirectoryOrCreate
+
+    - name: proc
+      hostPath:
+        path: /proc
+        type: "Directory"
+    - name: sys
+      hostPath:
+        path: /sys
+        type: "Directory"
+    - name: rootfs
+      hostPath:
+        path: /
+        type: "Directory"
+
+    - name: var-run
+      hostPath:
+        path: /var/run
+        type: Directory
+    - name: var-lib-docker
+      hostPath:
+        path: /var/lib/docker
+        type: Directory

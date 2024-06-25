@@ -13,3 +13,7 @@ TODOs
 - [ ] Set docker container locations into volatile locations or a place inside the external drive
 - [ ] Configure system for more agressive disk caching
       https://unix.stackexchange.com/questions/30286/can-i-configure-my-linux-system-for-more-aggressive-file-system-caching
+- [ ] Setup more services
+    - [ ] Tailscale entrypoint?
+    - [ ] Telemetry service
+    - [ ] NAS? With samba

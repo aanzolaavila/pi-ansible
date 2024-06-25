@@ -61,11 +61,21 @@
       ansible.posix.synchronize:
         src: configs/
         dest: /etc/kubelet.conf.d
+        delete: true
+
+    - name: Change config files ownership to be read by any user
+      file:
+        dest: /etc/kubelet.conf.d
+        owner: root
+        group: root
+        mode: "u=rwX,g=rX,o=rX"
+        recurse: true
 
     - name: Synchronization of src on the control machine to dest on the remote hosts
       ansible.posix.synchronize:
         src: specs/
         dest: /etc/kubelet.d
+        delete: true
 
 - name: ensure services are running
   block:

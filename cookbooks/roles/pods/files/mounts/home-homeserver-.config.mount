@@ -1,10 +1,10 @@
 [Unit]
 Description=Automount homeserver config
 Before=kubelet.service
-After=mnt-hdd.mount
+After=mnt-ssd.mount
 
 [Mount]
-What=/mnt/hdd/raspifs/drive
+What=/mnt/ssd/raspifs/drive
 Where=/home/homeserver/.config
 Type=ext3
 Options=rw,noatime
