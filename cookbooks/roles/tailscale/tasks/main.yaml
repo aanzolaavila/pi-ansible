@@ -1,0 +1,67 @@
+# Reference: https://tailscale.com/kb/1103/exit-nodes?tab=linux
+
+- name: Set mounts and symlinks
+  block:
+    - ansible.builtin.file:
+        path: /mnt/ssd/tailscale
+        state: directory
+
+    - name: Set symlink for docker
+      ansible.builtin.file:
+        src: /mnt/ssd/tailscale
+        dest: /var/lib/tailscale
+        state: link
+
+- name: Install tailscale
+  block:
+    - name: Install from official script
+      shell: |
+        command -v tailscale && exit 0 || "Not installed yet"
+        curl -fsSL https://tailscale.com/install.sh | sh
+
+    - name: Ensure tailscale service is up and running
+      service:
+        name: tailscaled
+        state: stopped
+        enabled: true
+
+- name: change tailscale service file
+  block:
+    - file:
+        path: /mnt/ssd/tailscale
+        state: directory
+
+    - name: copy mount service
+      copy:
+        src: tailscaled.service
+        dest: /lib/systemd/system/
+        owner: root
+        group: root
+        mode: "0444"
+
+    - name: configure mount service
+      service:
+        name: tailscaled.service
+        state: started
+        enabled: true
+
+- name: Configure systemwide options
+  block:
+    - file:
+        path: /etc/sysctl.d/99-tailscale.conf
+        state: touch
+
+    - name: enable ip forwarding
+      lineinfile:
+        path: /etc/sysctl.d/99-tailscale.conf
+        line: "{{ item }}"
+      with_items:
+        - "net.ipv4.ip_forward                 = 1"
+        - "net.ipv6.conf.all.forwarding        = 1"
+
+    - name: apply sysctl params without reboot
+      command: sysctl --system
+
+    - name: set it as an exit node
+      shell: |
+        tailscale set --advertise-exit-node

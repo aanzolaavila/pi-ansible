@@ -1,4 +1,3 @@
----
 - name: Set mounts and symlinks
   block:
     - loop:
@@ -31,7 +30,7 @@
       ansible.builtin.cron:
         name: "docker prune"
         special_time: hourly
-        job: "docker system prune -a"
+        job: "docker system prune --all --volumes --force"
 
 - name: Docker installation
   block:

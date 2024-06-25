@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: portainer
+spec:
+  hostNetwork: true
+  restartPolicy: Always
+  containers:
+    - name: portainer
+      image: portainer/portainer-ce:2.20.3-alpine
+      args: ["--bind=:9001"]
+      ports:
+        - containerPort: 8000
+          hostPort: 8000
+        - containerPort: 9443
+          hostPort: 9443
+        - containerPort: 9001
+          hostPort: 9001
+      volumeMounts:
+        - name: docker-sock
+          mountPath: /var/run/docker.sock
+        - name: portainer-data
+          mountPath: /data
+  volumes:
+    - name: docker-sock
+      hostPath:
+        path: /var/run/docker.sock
+        type: "Socket"
+    - name: portainer-data
+      hostPath:
+        path: /home/homeserver/.config/portainer
+        type: "DirectoryOrCreate"
