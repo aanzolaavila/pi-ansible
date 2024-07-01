@@ -6,24 +6,6 @@ spec:
   hostNetwork: true
   restartPolicy: Always
   containers:
-    - name: jackett
-      image: linuxserver/jackett:0.22.175
-      env: &environment
-        - name: PUID
-          value: "1001"
-        - name: PGID
-          value: "1001"
-        - name: TZ
-          value: "America/Bogota"
-      ports:
-        - containerPort: 9117
-          hostPort: 9117
-          protocol: TCP
-      volumeMounts:
-        - name: jackett-config
-          mountPath: /config
-        - name: jackett-download
-          mountPath: /downloads
     - name: bazarr
       image: linuxserver/bazarr:1.4.3
       env: *environment
@@ -63,20 +45,18 @@ spec:
           mountPath: /config
         - name: movie-data
           mountPath: /data/movies
-
-    # - name: overseer
-    #   image: sctx/overseerr:latest
-    #   env:
-    #     - name: TZ
-    #       value: "America/Bogota"
-    #     - name: PORT
-    #       value: "5055"
-    #   ports:
-    #     - containerPort: 5055
-    #       hostPort: 5055
-    #   volumeMounts:
-    #     - name: overseer-config
-    #       mountPath: /app/config
+    - name: readarr
+      image: lscr.io/linuxserver/readarr:0.3.28-develop
+      env: *environment
+      ports:
+        - containerPort: 8787
+          hostPort: 8787
+          protocol: TCP
+      volumeMounts:
+        - name: readarr-config
+          mountPath: /config
+        - name: book-data
+          mountPath: /books
 
     - name: jellyseer
       image: fallenbagel/jellyseerr:1.9.2
@@ -92,6 +72,33 @@ spec:
         - name: jellyseer-config
           mountPath: /app/config
 
+    - name: prowlarr
+      image: lscr.io/linuxserver/prowlarr:1.19.0
+      env: *environment
+      ports:
+        - containerPort: 9696
+          hostPort: 9696
+      volumeMounts:
+        - name: prowlarr-config
+          mountPath: /config
+
+    - name: flaresolverr
+      securityContext:
+        allowPrivilegeEscalation: false
+      image: flaresolverr/flaresolverr:v3.3.21
+      env:
+        - name: TZ
+          value: "America/Bogota"
+        - name: LOG_LEVEL
+          value: "info"
+        - name: LOG_HTML
+          value: "false"
+        - name: CAPTCHA_SOLVER
+          value: "none"
+      ports:
+        - containerPort: 8191
+          hostPort: 8191
+
     - name: tautulli
       image: lscr.io/linuxserver/tautulli:latest
       env: *environment
@@ -103,10 +110,6 @@ spec:
           mountPath: /config
 
   volumes:
-    - name: jackett-config
-      hostPath:
-        path: /home/homeserver/.config/jackett
-        type: "DirectoryOrCreate"
     - name: sonarr-config
       hostPath:
         path: /home/homeserver/.config/sonarr
@@ -119,10 +122,14 @@ spec:
       hostPath:
         path: /home/homeserver/.config/radarr
         type: "DirectoryOrCreate"
-    # - name: overseer-config
-    #   hostPath:
-    #     path: /home/homeserver/.config/overseer
-    #     type: "DirectoryOrCreate"
+    - name: readarr-config
+      hostPath:
+        path: /home/homeserver/.config/readarr
+        type: "DirectoryOrCreate"
+    - name: prowlarr-config
+      hostPath:
+        path: /home/homeserver/.config/prowlarr
+        type: "DirectoryOrCreate"
     - name: jellyseer-config
       hostPath:
         path: /home/homeserver/.config/jellyseer
@@ -131,10 +138,7 @@ spec:
       hostPath:
         path: /home/homeserver/.config/jellyseer
         type: "DirectoryOrCreate"
-    - name: jackett-download
-      hostPath:
-        path: /mnt/hdd/mediaserver/jackett
-        type: "DirectoryOrCreate"
+
     - name: tv-data
       hostPath:
         path: /mnt/hdd/mediaserver/tv
@@ -143,3 +147,7 @@ spec:
       hostPath:
         path: /mnt/hdd/mediaserver/movies
         type: "Directory"
+    - name: book-data
+      hostPath:
+        path: /mnt/hdd/mediaserver/books
+        type: "DirectoryOrCreate"
