@@ -27,10 +27,6 @@
 
 - name: change tailscale service file
   block:
-    - file:
-        path: /mnt/ssd/tailscale
-        state: directory
-
     - name: copy mount service
       copy:
         src: tailscaled.service
