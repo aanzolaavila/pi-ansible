@@ -25,6 +25,7 @@
         - glances
         - nmon
         - fatrace
+        - lsof
 
     - name: set system swapiness
       ansible.posix.sysctl:
