@@ -10,45 +10,19 @@
     system: no
     createhome: yes
 
-- name: Create loop filesystems
+- name: Link homeserver config location to SSD drive
   block:
-    - name: Check that the /mnt/hdd/raspifs/drive exists
-      stat:
-        path: /mnt/hdd/raspifs/drive
-        get_checksum: false
-        get_mime: false
-      register: stat_result
-
-    - name: Create the file, if it doesnt exist already
-      shell: |
-        touch drive
-        dd if=/dev/zero of=drive bs=1024 count=5000000 # ~5GB
-        mkfs.ext3 drive
-      args:
-        chdir: /mnt/ssd/raspifs
-        executable: /bin/bash
-      when: not stat_result.stat.exists
-
-- name: Mount loop filesystems
-  block:
-    - name: ensure config directory exists
-      file:
-        path: /home/homeserver/.config
+    - ansible.builtin.file:
+        path: /mnt/ssd/raspifs/config
         state: directory
 
-    - name: copy mount service
-      copy:
-        src: mounts/home-homeserver-.config.mount
-        dest: /etc/systemd/system/
-        owner: root
-        group: root
-        mode: "0444"
-
-    - name: configure mount service
-      service:
-        name: home-homeserver-.config.mount
-        state: started
-        enabled: true
+    - name: Set symlink for docker
+      ansible.builtin.file:
+        src: /mnt/ssd/raspifs/config
+        dest: /home/homeserver/.config
+        owner: homeserver
+        group: homeserver
+        state: link
 
 - name: Configure pods to run
   block:
@@ -83,14 +57,10 @@
       loop:
         - docker
         - cri-docker.service
+        - kubelet
       systemd:
         name: "{{ item }}"
         state: started
-
-    - name: Restart Kubelet
-      systemd:
-        name: "kubelet"
-        state: restarted
 
     - name: wait for kubelet to start
       wait_for: port=10250 timeout=60
