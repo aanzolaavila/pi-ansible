@@ -6,24 +6,15 @@ spec:
   hostNetwork: true
   restartPolicy: Always
   containers:
-    - name: bazarr
-      image: linuxserver/bazarr:1.4.3
-      env: *environment
-      ports:
-        - containerPort: 6767
-          hostPort: 6767
-          protocol: TCP
-      volumeMounts:
-        - name: bazarr-config
-          mountPath: /config
-        - name: tv-data
-          mountPath: /data/tv
-        - name: movie-data
-          mountPath: /data/movies
-
     - name: sonarr
       image: linuxserver/sonarr:4.0.5
-      env: *environment
+      env: &environment
+        - name: PUID
+          value: "1001"
+        - name: PGID
+          value: "1001"
+        - name: TZ
+          value: "America/Bogota"
       ports:
         - containerPort: 8989
           hostPort: 8989
@@ -57,6 +48,21 @@ spec:
           mountPath: /config
         - name: book-data
           mountPath: /books
+
+    - name: bazarr
+      image: linuxserver/bazarr:1.4.3
+      env: *environment
+      ports:
+        - containerPort: 6767
+          hostPort: 6767
+          protocol: TCP
+      volumeMounts:
+        - name: bazarr-config
+          mountPath: /config
+        - name: tv-data
+          mountPath: /data/tv
+        - name: movie-data
+          mountPath: /data/movies
 
     - name: jellyseer
       image: fallenbagel/jellyseerr:1.9.2
