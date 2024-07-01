@@ -5,6 +5,8 @@ metadata:
 spec:
   hostNetwork: true
   restartPolicy: Always
+  securityContext:
+    allowPrivilegeEscalation: false
   containers:
     - name: portainer
       image: portainer/portainer-ce:2.20.3-alpine

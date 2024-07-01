@@ -32,8 +32,6 @@ spec:
       volumeMounts:
         - name: config
           mountPath: /config
-        # - name: data
-        #   mountPath: /data
         - name: incomplete-data
           mountPath: /data/incomplete
         - name: movie-data
@@ -45,10 +43,6 @@ spec:
       hostPath:
         path: /home/homeserver/.config/qbittorrent
         type: "DirectoryOrCreate"
-    # - name: data
-    #   hostPath:
-    #     path: /mnt/hdd/mediaserver
-    #     type: "Directory"
     - name: incomplete-data
       hostPath:
         path: /mnt/ssd/qbittorrent/incomplete
