@@ -2,7 +2,7 @@
 
 TODOs
 - [x] Setup config locations to be outside on `/mnt/hdd`, look for a way to set a mountpoint for the configs, maybe a filesystem-on-a-file?
-- [ ] Fix Kubelet `hostPort` capability from CNI plugins
+- [x] Fix Kubelet `hostPort` capability from CNI plugins - Fixed with `flannel`
 - [ ] Setup telemetry alerts for system healthcheck, maybe also use a notification system to send an email to myself
     - [ ] Disk IO
     - [ ] SMART info
@@ -17,3 +17,4 @@ TODOs
     - [x] Tailscale entrypoint?
     - [ ] Telemetry service
     - [ ] NAS? With samba
+- [ ] Setup a service that send a notification on every host bootup (e.g. this will let me know if there was a blackout)
