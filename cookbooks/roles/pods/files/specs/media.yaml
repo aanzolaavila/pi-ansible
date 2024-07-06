@@ -3,7 +3,6 @@ kind: Pod
 metadata:
   name: media
 spec:
-  hostNetwork: true
   restartPolicy: Always
   containers:
     - name: sonarr

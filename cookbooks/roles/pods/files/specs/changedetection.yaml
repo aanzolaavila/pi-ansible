@@ -3,7 +3,6 @@ kind: Pod
 metadata:
   name: changedetection.io
 spec:
-  hostNetwork: true
   restartPolicy: Always
   containers:
     - name: changedetection

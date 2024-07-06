@@ -3,7 +3,6 @@ kind: Pod
 metadata:
   name: pihole
 spec:
-  hostNetwork: true # TODO remove in the future
   restartPolicy: Always
   containers:
     - name: pihole
@@ -21,8 +20,8 @@ spec:
           value: "all"
         - name: ServerIP
           value: "192.168.0.111"
-        - name: WEB_PORT
-          value: "700"
+        # - name: WEB_PORT
+        #   value: "700"
       ports:
         - containerPort: 53
           hostPort: 53
@@ -30,7 +29,7 @@ spec:
         - containerPort: 53
           hostPort: 53
           protocol: UDP
-        - containerPort: 700
+        - containerPort: 80
           hostPort: 700
           protocol: TCP
       volumeMounts:

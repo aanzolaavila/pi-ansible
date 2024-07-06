@@ -3,7 +3,6 @@ kind: Pod
 metadata:
   name: openhab
 spec:
-  hostNetwork: true
   restartPolicy: Always
   containers:
     - name: openhab
@@ -19,6 +18,14 @@ spec:
           value: "8090"
         - name: OPENHAB_HTTPS_PORT
           value: "8091"
+
+      ports:
+        - containerPort: 8090
+          hostPort: 8090
+          protocol: TCP
+        - containerPort: 8091
+          hostPort: 8091
+          protocol: TCP
 
       volumeMounts:
         - name: conf

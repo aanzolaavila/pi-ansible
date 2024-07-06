@@ -3,20 +3,20 @@ kind: Pod
 metadata:
   name: portainer
 spec:
-  hostNetwork: true
+  # hostNetwork: true
   restartPolicy: Always
   securityContext:
     allowPrivilegeEscalation: false
   containers:
     - name: portainer
       image: portainer/portainer-ce:2.20.3-alpine
-      args: ["--bind=:9001"]
+      # args: ["--bind=:9001"]
       ports:
         - containerPort: 8000
           hostPort: 8000
         - containerPort: 9443
           hostPort: 9443
-        - containerPort: 9001
+        - containerPort: 9000
           hostPort: 9001
       volumeMounts:
         - name: docker-sock
@@ -27,8 +27,8 @@ spec:
     - name: docker-sock
       hostPath:
         path: /var/run/docker.sock
-        type: "Socket"
+        type: Socket
     - name: portainer-data
       hostPath:
         path: /home/homeserver/.config/portainer
-        type: "DirectoryOrCreate"
+        type: DirectoryOrCreate

@@ -37,7 +37,6 @@ kind: Pod
 metadata:
   name: telemetry
 spec:
-  hostNetwork: true
   restartPolicy: Always
   securityContext:
     runAsUser: 1001

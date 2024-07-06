@@ -3,7 +3,6 @@ kind: Pod
 metadata:
   name: qbittorrent
 spec:
-  hostNetwork: true
   restartPolicy: Always
   containers:
     - name: qbittorrent
@@ -24,10 +23,13 @@ spec:
           value: "8080"
       ports:
         - containerPort: 6881
+          hostPort: 6881
           protocol: TCP
         - containerPort: 6881
+          hostPort: 6881
           protocol: UDP
         - containerPort: 8080
+          hostPort: 8080
           protocol: TCP
       volumeMounts:
         - name: config
