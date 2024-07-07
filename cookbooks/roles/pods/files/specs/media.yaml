@@ -105,7 +105,7 @@ spec:
           hostPort: 8191
 
     - name: tautulli
-      image: lscr.io/linuxserver/tautulli:latest
+      image: lscr.io/linuxserver/tautulli:2.14.3
       env: *environment
       ports:
         - containerPort: 8181
