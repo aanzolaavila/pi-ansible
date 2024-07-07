@@ -19,15 +19,14 @@
         command -v tailscale && exit 0 || "Not installed yet"
         curl -fsSL https://tailscale.com/install.sh | sh
 
-    - name: Ensure tailscale service is up and running
+    - name: Ensure tailscale service is not running
       service:
         name: tailscaled
         state: stopped
-        enabled: true
 
 - name: change tailscale service file
   block:
-    - name: copy mount service
+    - name: copy tailscale service file
       copy:
         src: tailscaled.service
         dest: /lib/systemd/system/
@@ -35,7 +34,7 @@
         group: root
         mode: "0444"
 
-    - name: configure mount service
+    - name: start tailscale service
       service:
         name: tailscaled.service
         state: started

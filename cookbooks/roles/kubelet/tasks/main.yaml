@@ -109,6 +109,9 @@
         dest: /opt/cni/bin
         remote_src: true
 
+    - name: setup flannel cni plugin
+      import_tasks: flannel.yaml
+
 - name: Configure Kubelet
   block:
     - name: Create config files
@@ -130,14 +133,14 @@
       file:
         path: /mnt/docker
         state: directory
-    - name: Restart container services
+    - name: Start container services
       loop:
         - docker
         - cri-docker.service
         - kubelet
       systemd:
         name: "{{ item }}"
-        state: restarted
+        state: started
         daemon_reload: true
         enabled: yes
     - name: wait for kubelet to start

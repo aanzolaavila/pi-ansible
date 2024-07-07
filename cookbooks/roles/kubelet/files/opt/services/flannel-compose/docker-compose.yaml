@@ -1,0 +1,75 @@
+services:
+  install-cni-plugin:
+    container_name: install-cni-plugin
+    image: docker.io/flannel/flannel-cni-plugin:v1.5.1-flannel1
+    restart: no
+    entrypoint: "cp"
+    command:
+      - -f
+      - /flannel
+      - /opt/cni/bin/flannel
+    volumes:
+      - /opt/cni/bin
+
+  install-cni:
+    container_name: install-cni
+    image: docker.io/flannel/flannel:v0.25.4
+    restart: no
+    entrypoint: "cp"
+    command:
+      - -f
+      - /etc/kube-flannel/cni-conf.json
+      - /etc/cni/net.d/10-flannel.conflist
+    volumes:
+      - ./config/:/etc/kube-flannel:ro
+      - /etc/cni/net.d/
+
+  etcd:
+    container_name: etcd
+    restart: always
+    image: quay.io/coreos/etcd:v3.4.33-arm64
+    network_mode: host
+    environment: &env
+      - ETCDCTL_API=3
+      - ETCD_UNSUPPORTED_ARCH=arm64
+
+  etcd-config:
+    container_name: etcd-cfg
+    restart: on-failure
+    image: quay.io/coreos/etcd:v3.4.33-arm64
+    network_mode: host
+    environment: *env
+    entrypoint: "etcdctl"
+    command:
+      - put
+      - /coreos.com/network/config
+      - '{ "Network": "10.5.0.0/16", "Backend": {"Type": "vxlan"}}'
+    depends_on:
+      etcd:
+        condition: service_started
+
+  flannel:
+    container_name: flannel
+    image: docker.io/flannel/flannel:v0.25.4
+    restart: always
+    privileged: false
+    entrypoint: "/opt/bin/flanneld"
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      - EVENT_QUEUE_DEPTH=5000
+    volumes:
+      - /run/flannel:/run/flannel
+      - ./config/:/etc/kube-flannel/:ro
+      - /run/xtables.lock
+    depends_on:
+      install-cni:
+        condition: service_completed_successfully
+      install-cni-plugin:
+        condition: service_completed_successfully
+      etcd-config:
+        condition: service_completed_successfully
+      etcd:
+        condition: service_started
