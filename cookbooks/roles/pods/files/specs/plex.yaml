@@ -3,7 +3,7 @@ kind: Pod
 metadata:
   name: plex
 spec:
-  # hostNetwork: true
+  hostNetwork: true
   restartPolicy: Always
   containers:
     - name: plex
