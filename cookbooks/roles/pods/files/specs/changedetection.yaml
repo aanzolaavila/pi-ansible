@@ -7,6 +7,9 @@ spec:
   containers:
     - name: changedetection
       image: dgtlmoon/changedetection.io:0.45.25
+      env:
+        - name: PLAYWRIGHT_DRIVER_URL
+          value: ws://localhost:3000
       ports:
         - containerPort: 5000
           hostPort: 5000
@@ -14,8 +17,22 @@ spec:
       volumeMounts:
         - name: datastore
           mountPath: /datastore
+    - name: browserless
+      image: dgtlmoon/sockpuppetbrowser:latest
+      env:
+        - name: CONCURRENT
+          value: "10"
+      ports:
+        - containerPort: 3000
+          protocol: TCP
+      volumeMounts:
+        - name: shm
+          mountPath: /dev/shm
   volumes:
     - name: datastore
       hostPath:
         path: /home/homeserver/.config/changedetection
         type: "DirectoryOrCreate"
+    - name: shm
+      emptyDir:
+        medium: Memory
