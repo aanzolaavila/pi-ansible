@@ -78,7 +78,7 @@ spec:
           mountPath: /app/config
 
     - name: prowlarr
-      image: lscr.io/linuxserver/prowlarr:1.19.0
+      image: lscr.io/linuxserver/prowlarr:1.20.1
       env: *environment
       ports:
         - containerPort: 9696
