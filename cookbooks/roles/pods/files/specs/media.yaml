@@ -6,7 +6,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: sonarr
-      image: linuxserver/sonarr:4.0.6
+      image: linuxserver/sonarr:4.0.8
       env: &environment
         - name: PUID
           value: "1001"
@@ -24,7 +24,7 @@ spec:
         - name: tv-data
           mountPath: /data/tv
     - name: radarr
-      image: linuxserver/radarr:5.7.0
+      image: linuxserver/radarr:5.8.3
       env: *environment
       ports:
         - containerPort: 7878
@@ -78,7 +78,7 @@ spec:
           mountPath: /app/config
 
     - name: prowlarr
-      image: lscr.io/linuxserver/prowlarr:1.20.1
+      image: lscr.io/linuxserver/prowlarr:1.21.2
       env: *environment
       ports:
         - containerPort: 9696
@@ -105,7 +105,7 @@ spec:
           hostPort: 8191
 
     - name: tautulli
-      image: lscr.io/linuxserver/tautulli:2.14.3
+      image: lscr.io/linuxserver/tautulli:2.14.4
       env: *environment
       ports:
         - containerPort: 8181
