@@ -6,7 +6,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: sonarr
-      image: linuxserver/sonarr:4.0.8
+      image: linuxserver/sonarr:4.0.9
       env: &environment
         - name: PUID
           value: "1001"
@@ -24,7 +24,7 @@ spec:
         - name: tv-data
           mountPath: /data/tv
     - name: radarr
-      image: linuxserver/radarr:5.8.3
+      image: linuxserver/radarr:5.11.0
       env: *environment
       ports:
         - containerPort: 7878
@@ -49,7 +49,7 @@ spec:
           mountPath: /books
 
     - name: bazarr
-      image: linuxserver/bazarr:1.4.3
+      image: linuxserver/bazarr:1.4.4
       env: *environment
       ports:
         - containerPort: 6767
@@ -78,7 +78,7 @@ spec:
           mountPath: /app/config
 
     - name: prowlarr
-      image: lscr.io/linuxserver/prowlarr:1.21.2
+      image: lscr.io/linuxserver/prowlarr:1.24.3
       env: *environment
       ports:
         - containerPort: 9696
@@ -105,7 +105,7 @@ spec:
           hostPort: 8191
 
     - name: tautulli
-      image: lscr.io/linuxserver/tautulli:2.14.4
+      image: lscr.io/linuxserver/tautulli:2.14.5
       env: *environment
       ports:
         - containerPort: 8181
@@ -115,7 +115,7 @@ spec:
           mountPath: /config
 
     - name: qbittorrent
-      image: lscr.io/linuxserver/qbittorrent:4.6.5
+      image: lscr.io/linuxserver/qbittorrent:4.6.7
       resources:
         requests:
           memory: "1Gi"
