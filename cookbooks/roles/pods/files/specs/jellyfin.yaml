@@ -6,7 +6,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: jellyfin
-      image: linuxserver/jellyfin:10.9.7
+      image: linuxserver/jellyfin:10.9.11
       env:
         - name: PUID
           value: "1001"

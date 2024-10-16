@@ -24,7 +24,7 @@ spec:
         - name: tv-data
           mountPath: /data/tv
     - name: radarr
-      image: linuxserver/radarr:5.11.0
+      image: linuxserver/radarr:5.12.2
       env: *environment
       ports:
         - containerPort: 7878
@@ -64,7 +64,7 @@ spec:
           mountPath: /data/movies
 
     - name: jellyseer
-      image: fallenbagel/jellyseerr:1.9.2
+      image: fallenbagel/jellyseerr:2.0.0
       env:
         - name: TZ
           value: "America/Bogota"
