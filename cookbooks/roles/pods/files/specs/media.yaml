@@ -6,7 +6,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: sonarr
-      image: linuxserver/sonarr:4.0.9
+      image: linuxserver/sonarr:4.0.10
       env: &environment
         - name: PUID
           value: "1001"
@@ -24,7 +24,7 @@ spec:
         - name: tv-data
           mountPath: /data/tv
     - name: radarr
-      image: linuxserver/radarr:5.12.2
+      image: linuxserver/radarr:5.14.0
       env: *environment
       ports:
         - containerPort: 7878
@@ -64,7 +64,7 @@ spec:
           mountPath: /data/movies
 
     - name: jellyseer
-      image: fallenbagel/jellyseerr:2.0.0
+      image: fallenbagel/jellyseerr:2.1.0
       env:
         - name: TZ
           value: "America/Bogota"
@@ -78,7 +78,7 @@ spec:
           mountPath: /app/config
 
     - name: prowlarr
-      image: lscr.io/linuxserver/prowlarr:1.24.3
+      image: lscr.io/linuxserver/prowlarr:1.25.4
       env: *environment
       ports:
         - containerPort: 9696
@@ -115,7 +115,7 @@ spec:
           mountPath: /config
 
     - name: qbittorrent
-      image: lscr.io/linuxserver/qbittorrent:4.6.7
+      image: lscr.io/linuxserver/qbittorrent:5.0.1
       resources:
         requests:
           memory: "1Gi"
