@@ -1,16 +1,18 @@
 - name: Mount points at boot time
   block:
     - name: Store HDD
-      mount:
+      ansible.posix.mount:
         path: /mnt/hdd
         state: mounted
         src: UUID=5E66-6BB1
         fstype: exfat
         opts: umask=0000
+        passno: 2
 
     - name: Store SSD
-      mount:
+      ansible.posix.mount:
         path: /mnt/ssd
         state: mounted
         src: UUID=5a006874-a96a-4822-86e6-6e75c5c44861
         fstype: ext4
+        passno: 2
