@@ -6,7 +6,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: changedetection
-      image: dgtlmoon/changedetection.io:0.48.05
+      image: dgtlmoon/changedetection.io:0.48.06
       env:
         - name: PLAYWRIGHT_DRIVER_URL
           value: ws://localhost:3000
