@@ -6,7 +6,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: heimdall
-      image: lscr.io/linuxserver/heimdall:v2.6.3-ls293
+      image: lscr.io/linuxserver/heimdall:v2.6.3-ls295
       env:
         - name: PUID
           value: "1001"
