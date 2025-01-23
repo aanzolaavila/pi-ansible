@@ -64,7 +64,7 @@ spec:
           mountPath: /data/movies
 
     - name: jellyseer
-      image: fallenbagel/jellyseerr:2.2.3
+      image: fallenbagel/jellyseerr:2.3.0
       env:
         - name: TZ
           value: "America/Bogota"
