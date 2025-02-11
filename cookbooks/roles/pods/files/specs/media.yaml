@@ -24,7 +24,7 @@ spec:
         - name: tv-data
           mountPath: /data/tv
     - name: radarr
-      image: linuxserver/radarr:5.17.2
+      image: linuxserver/radarr:5.18.4
       env: *environment
       ports:
         - containerPort: 7878
