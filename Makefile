@@ -13,3 +13,11 @@ apply:
 .PHONY: pods
 pods:
 	ansible-playbook -i inventory.yaml cookbooks/pods.yaml
+
+.PHONY: tailscale
+tailscale:
+	ansible-playbook -i inventory.yaml cookbooks/tailscale.yaml
+
+.PHONY: resolv
+resolv:
+	ansible-playbook -i inventory.yaml cookbooks/resolv.yaml

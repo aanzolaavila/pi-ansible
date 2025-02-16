@@ -3,8 +3,10 @@
   become: yes
   roles:
     - base
+    - resolv
     - mounts
     - log2ram
     - docker
     - kubelet
     - pods
+    - tailscale

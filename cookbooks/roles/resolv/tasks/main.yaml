@@ -1,0 +1,40 @@
+---
+- name: Configure resolv
+  block:
+    - name: install systemd-resolved
+      apt:
+        name: systemd-resolved
+        state: present
+
+    - name: uninstall openresolv
+      apt:
+        name: openresolv
+        state: absent
+
+    - name: create resolv.conf link
+      ansible.builtin.file:
+        src: /run/systemd/resolve/resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+
+    - name: create resolved.d directory
+      loop:
+        - absent
+        - directory
+      file:
+        path: &dir /etc/systemd/resolved.conf.d/
+        state: "{{item}}"
+
+    - name: copy systemd-resolved configs
+      copy:
+        src: .
+        dest: *dir
+        owner: root
+        group: root
+        mode: "0444"
+
+    - name: start systemd-resolved service
+      service:
+        name: systemd-resolved
+        state: restarted
+        enabled: true

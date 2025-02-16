@@ -16,7 +16,6 @@
   block:
     - name: Install from official script
       shell: |
-        command -v tailscale && exit 0 || "Not installed yet"
         curl -fsSL https://tailscale.com/install.sh | sh
 
     - name: Ensure tailscale service is not running
@@ -26,6 +25,14 @@
 
 - name: change tailscale service file
   block:
+    - name: copy environment file
+      copy:
+        src: tailscaled
+        dest: /etc/default/
+        owner: root
+        group: root
+        mode: "0444"
+
     - name: copy tailscale service file
       copy:
         src: tailscaled.service
@@ -34,10 +41,11 @@
         group: root
         mode: "0444"
 
-    - name: start tailscale service
+    - name: setup tailscale service
       service:
         name: tailscaled.service
-        state: started
+        state: restarted
+        daemon_reload: true
         enabled: true
 
 - name: Configure systemwide options
