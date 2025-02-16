@@ -24,8 +24,9 @@
           - fatrace
           - lsof
           - bpftrace
+          - smartmontools
         state: present
-        update_cache: yes
+        update_cache: no
 
     - name: set system swapiness
       ansible.posix.sysctl:

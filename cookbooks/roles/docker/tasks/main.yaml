@@ -17,7 +17,7 @@
         state: link
 
     - name: Set tmpfs mount for containerd
-      mount:
+      ansible.posix.mount:
         path: /var/lib/containerd
         src: tmpfs
         state: mounted
@@ -35,27 +35,25 @@
 - name: Docker installation
   block:
     - name: add docker GPG
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
     - name: add docker respository
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb https://download.docker.com/linux/ubuntu bionic stable
         state: present
 
     - name: install docker
-      loop:
-        - docker-ce
-        - docker-ce-cli
-        # - containerd.io
-      apt:
-        name: "{{item}}"
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
         state: latest
         update_cache: no
 
     - name: copy daemon configuration
-      copy:
+      ansible.builtin.copy:
         src: daemon.json
         dest: /etc/docker/daemon.json
       notify: restart docker
@@ -65,40 +63,39 @@
         - docker.service
         - docker.socket
         - containerd
-      service:
+      ansible.builtin.service:
         name: "{{item}}"
         state: started
         enabled: yes
 
     - name: Install docker-compose
-      get_url:
+      ansible.builtin.get_url:
         url: https://github.com/docker/compose/releases/download/v2.23.3/docker-compose-linux-aarch64
         dest: /usr/local/bin/docker-compose
         mode: "u+x,g+x"
 
-# We set all docker configuration on daemon.json
-# - name: Remove default flags for docker daemon
-#   lineinfile:
-#     path: /etc/sysconfig/docker
-#     regexp: "^OPTIONS="
-#     line: 'OPTIONS=""'
-
 - name: Configure CRI Docker
   block:
-    - name: Decompress archive
-      ansible.builtin.unarchive:
-        src: https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.14/cri-dockerd-0.3.14.arm64.tgz
-        dest: /tmp
-        mode: "0550"
-        remote_src: yes
+    - name: decompress archive
+      block:
+        - ansible.builtin.unarchive:
+            src: https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.14/cri-dockerd-0.3.14.arm64.tgz
+            dest: /tmp
+            mode: "0550"
+            remote_src: yes
 
-    - name: Move binary to /usr/bin
-      ansible.builtin.shell: |
-        mv /tmp/cri-dockerd/cri-dockerd /usr/bin/cri-dockerd
+        - ansible.builtin.copy:
+            src: &tmp-cri /tmp/cri-dockerd/cri-dockerd
+            dest: /usr/bin/cri-dockerd
+            remote_src: true
+
+        - ansible.builtin.file:
+            path: *tmp-cri
+            state: absent
 
     - name: Download cri-docker services files
       ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/Mirantis/cri-dockerd/master/packaging/systemd/{{item}}
+        url: https://raw.githubusercontent.com/Mirantis/cri-dockerd/refs/tags/v0.3.14/packaging/systemd/{{item}}
         dest: /etc/systemd/system/{{item}}
         mode: "0440"
       loop:

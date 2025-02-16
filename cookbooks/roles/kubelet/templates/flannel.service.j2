@@ -8,6 +8,7 @@ Before=kubelet.service
 WorkingDirectory=/opt/services/flannel-compose
 Type=oneshot
 RemainAfterExit=yes
+Restart=no
 
 ExecStart=/usr/local/bin/docker-compose up -d
 

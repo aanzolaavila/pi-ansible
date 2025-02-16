@@ -15,18 +15,18 @@
 - name: Install tailscale
   block:
     - name: Install from official script
-      shell: |
+      ansible.builtin.shell: |
         curl -fsSL https://tailscale.com/install.sh | sh
 
     - name: Ensure tailscale service is not running
-      service:
+      ansible.builtin.service:
         name: tailscaled
         state: stopped
 
 - name: change tailscale service file
   block:
     - name: copy environment file
-      copy:
+      ansible.builtin.copy:
         src: tailscaled
         dest: /etc/default/
         owner: root
@@ -34,7 +34,7 @@
         mode: "0444"
 
     - name: copy tailscale service file
-      copy:
+      ansible.builtin.copy:
         src: tailscaled.service
         dest: /lib/systemd/system/
         owner: root
@@ -42,7 +42,7 @@
         mode: "0444"
 
     - name: setup tailscale service
-      service:
+      ansible.builtin.service:
         name: tailscaled.service
         state: restarted
         daemon_reload: true
@@ -50,12 +50,13 @@
 
 - name: Configure systemwide options
   block:
-    - file:
+    - name: create sysctl tailscale config file
+      ansible.builtin.file:
         path: /etc/sysctl.d/99-tailscale.conf
         state: touch
 
     - name: enable ip forwarding
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/sysctl.d/99-tailscale.conf
         line: "{{ item }}"
       with_items:
@@ -63,8 +64,8 @@
         - "net.ipv6.conf.all.forwarding        = 1"
 
     - name: apply sysctl params without reboot
-      command: sysctl --system
+      ansible.builtin.command: sysctl --system
 
     - name: set it as an exit node
-      shell: |
+      ansible.builtin.shell: |
         tailscale set --advertise-exit-node
