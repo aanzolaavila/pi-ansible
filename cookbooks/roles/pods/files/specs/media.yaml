@@ -115,7 +115,7 @@ spec:
           mountPath: /config
 
     - name: qbittorrent
-      image: lscr.io/linuxserver/qbittorrent:5.0.5
+      image: lscr.io/linuxserver/qbittorrent:5.0.5-libtorrentv1
       resources:
         requests:
           memory: "1Gi"
