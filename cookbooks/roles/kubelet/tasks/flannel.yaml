@@ -1,21 +1,23 @@
-- file:
-    path: /opt/services/flannel-compose
-    state: directory
+- name: Setup flannel
+  block:
+    - file:
+        path: /opt/services/flannel-compose
+        state: directory
 
-- name: Setup system service for flannel
-  ansible.builtin.template:
-    src: flannel.service.j2
-    dest: /etc/systemd/system/flannel-compose.service
+    - name: Setup system service for flannel
+      ansible.builtin.template:
+        src: flannel.service.j2
+        dest: /etc/systemd/system/flannel-compose.service
 
-- name: start docker service
-  ansible.builtin.service:
-    name: "docker"
-    state: started
-    enabled: true
+    - name: start docker service
+      ansible.builtin.service:
+        name: "docker"
+        state: started
+        enabled: true
 
-- name: start and enable flannel compose service
-  systemd:
-    name: flannel-compose.service
-    state: started
-    daemon-reload: true
-    enabled: true
+    - name: start and enable flannel compose service
+      systemd:
+        name: flannel-compose.service
+        state: started
+        daemon-reload: true
+        enabled: true

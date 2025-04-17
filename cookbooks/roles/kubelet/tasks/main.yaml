@@ -73,12 +73,11 @@
 - name: Install Kubelet
   block:
     - name: install Kubelet
-      loop:
-        - kubelet
-        - kubeadm
-        - kubernetes-cni
       ansible.builtin.apt:
-        name: "{{item}}"
+        name:
+          - kubelet
+          - kubeadm
+          - kubernetes-cni
         state: present
         update_cache: true
 

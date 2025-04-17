@@ -29,7 +29,7 @@
     - name: Docker cleanup
       ansible.builtin.cron:
         name: "docker prune"
-        special_time: hourly
+        special_time: daily
         job: "docker system prune --all --volumes --force"
 
 - name: Docker installation
